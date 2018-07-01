@@ -13,8 +13,10 @@ public:
 	void write();
 	void write(byte in);
 	byte read();
+	String read(int chainLength);
 	void clear();
 private:
+	String bytetostring(byte inByte);
 	int _clockPin;
 	int _inDataPin;
 	int _outDataPin;

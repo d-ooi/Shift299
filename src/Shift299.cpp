@@ -83,8 +83,58 @@ byte Shift299::read()
 	return outputByte;
 }
 
+// This method is for reading a chain of registers and outputs a string
+String Shift299::read(int chainLength)
+{
+	String outputString = "";
+	String tmpString;
+	byte outputByte = 64;
+	//int currentBit;
+
+	// configure register to load the register with data presented
+	// at the input pins
+	digitalWrite(_pinOE1, LOW);
+	digitalWrite(_pinOE2, LOW);
+	digitalWrite(_pinS0, HIGH);
+	digitalWrite(_pinS1, HIGH);
+
+	digitalWrite(_clockPin, LOW);
+	delayMicroseconds(0.2);
+	digitalWrite(_clockPin, HIGH);
+
+	// configure for shift left
+	digitalWrite(_pinS0, LOW);
+	digitalWrite(_pinS1, HIGH);
+
+	for (int i = 0; i < chainLength; i++)
+	{
+		outputByte = shiftIn(_inDataPin, _clockPin, LSBFIRST);
+		tmpString = Shift299::bytetostring(outputByte);
+		outputString = tmpString + outputString;
+	}
+	
+	return outputString;
+}
+
 // This method clears the register by shifting in "00000000"
 void Shift299::clear()
 {
 	Shift299::load(0);
+}
+
+// This method converts a byte into a string
+// displaying all 8 bits
+String Shift299::bytetostring(byte inByte)
+{
+	String outString = "";
+	
+	for(byte bitMask = 0x80; bitMask; bitMask >>= 1)
+	{
+		if(bitMask  & inByte)
+			outString = outString + "1";
+		else
+			outString = outString + "0";
+    }
+	
+	return outString;
 }
